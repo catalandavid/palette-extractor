@@ -1,9 +1,8 @@
-// Package extractor extracts the dominant color or a representative color palette
-// from an image.
 package extractor
 
 import (
 	"fmt"
+	"image"
 	_ "image/gif"
 	_ "image/jpeg"
 	_ "image/png"
@@ -33,11 +32,36 @@ func NewExtractor(filename string, quality int) *Extractor {
 
 	pixels, err := getPixels(reader, quality)
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s\n", err)
+		os.Exit(1)
+	}
+
+	// fmt.Println(pixels)
+
+	extractor.filename = filename
+	extractor.quality = quality
+	extractor.pixels = pixels
+
+	return extractor
+}
+
+// NewPNGImageExtractor ...
+func NewPNGImageExtractor(png image.Image, quality int) *Extractor {
+	extractor := &Extractor{}
+
+	// reader, err := os.Open(filename)
+	// if err != nil {
+	// 	fmt.Fprintf(os.Stderr, "%v\n", err)
+	// }
+	// defer reader.Close()
+
+	pixels, err := getPixelsFromPNG(png, quality)
+	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s", err)
 		os.Exit(1)
 	}
 
-	extractor.filename = filename
+	extractor.filename = "filename"
 	extractor.quality = quality
 	extractor.pixels = pixels
 
@@ -69,4 +93,11 @@ func (extractor *Extractor) GetPalette(count int) [][]int {
 // The color is returned as [r g b].
 func (extractor *Extractor) GetColor() []int {
 	return extractor.GetPalette(5)[0]
+}
+
+// GetNumberOfColor ...
+func (extractor *Extractor) GetNumberOfColor() int {
+	histogram := computeHistogram(extractor.pixels)
+	// fmt.Println(histogram)
+	return len(histogram)
 }

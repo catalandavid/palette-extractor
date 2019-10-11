@@ -23,10 +23,12 @@ func quantize(pixels []pixel, maxColor int) *colorMap {
 	}
 
 	histogram := computeHistogram(pixels)
-	if len(histogram) <= maxColor {
-		fmt.Fprintf(os.Stderr, "insufficient number of levels of quantification")
-		os.Exit(1)
-	}
+
+	// fmt.Println(len(histogram))
+	// if len(histogram) <= maxColor {
+	// 	fmt.Fprintf(os.Stderr, "insufficient number of levels of quantification")
+	// 	os.Exit(1)
+	// }
 
 	boxes := newBoxes(count)
 	boxes.Push(computeBox(pixels, histogram))
@@ -88,6 +90,7 @@ func computeHistogram(pixels []pixel) map[int]int {
 	histogram := make(map[int]int)
 
 	for _, pixel := range pixels {
+		// fmt.Println(pixel)
 		index = getColorIndex(pixel.R>>rshift, pixel.G>>rshift, pixel.B>>rshift)
 		if val, ok := histogram[index]; ok {
 			histogram[index] = val + 1

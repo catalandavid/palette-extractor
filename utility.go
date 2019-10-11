@@ -1,6 +1,7 @@
 package extractor
 
 import (
+	// "fmt"
 	"image"
 	"io"
 )
@@ -25,8 +26,33 @@ func getPixels(file io.Reader, quality int) ([]pixel, error) {
 	for i := 0; i < width*height; i += quality {
 		pixel := rgbaToPixel(img.At(i%width, i/width).RGBA())
 
+		// fmt.Println(pixel)
+
 		if pixel.A >= 125 {
-			if !(pixel.R > 250 && pixel.G > 250 && pixel.B > 250) {
+			// if !(pixel.R > 250 && pixel.G > 250 && pixel.B > 250) {
+			pixels = append(pixels, pixel)
+			// }
+		}
+	}
+
+	return pixels, nil
+}
+
+func getPixelsFromPNG(img image.Image, quality int) ([]pixel, error) {
+	// img, _, err := image.Decode(file)
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	bounds := img.Bounds()
+	width, height := bounds.Max.X, bounds.Max.Y
+
+	var pixels []pixel
+	for i := 0; i < width*height; i += quality {
+		pixel := rgbaToPixel(img.At(i%width, i/width).RGBA())
+
+		if pixel.A >= 125 {
+			if !(pixel.R > 253 && pixel.G > 253 && pixel.B > 253) {
 				pixels = append(pixels, pixel)
 			}
 		}
